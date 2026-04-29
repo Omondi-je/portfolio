@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeff Omondi — Data Scientist & Machine Learning Engineer</title>
+    <meta name="description" content="Transforming complex data into intelligent, actionable solutions.">
+    <meta property="og:title" content="Jeff Omondi — Data Scientist & ML Engineer">
+    <meta property="og:description" content="Portfolio showcasing end-to-end data science solutions.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#020204',
+                        cyan: '#00f0ff',
+                        violet: '#bd00ff',
+                        magenta: '#ff006e',
+                        surface: 'rgba(255,255,255,0.03)',
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        grotesk: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --void: #020204;
+            --cyan: #00f0ff;
+            --violet: #bd00ff;
+            --magenta: #ff006e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            background: var(--void);
+            scrollbar-width: thin;
+            scrollbar-color: var(--cyan) var(--void);
+        }
+
+        body {
+            background: var(--void);
+            color: #e2e8f0;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--void); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--cyan), var(--violet)); border-radius: 2px; }
+
+        /* Custom Cursor */
+        #cursor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background: var(--cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s ease-out, width 0.3s, height 0.3s, background 0.3s;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+        }
+        #cursor.hover {
+            width: 40px; height: 40px;
+            background: transparent;
+            border: 1px solid var(--cyan);
+            box-shadow: 0 0 20px var(--cyan), inset 0 0 10px rgba(0,240,255,0.2);
+        }
+        #cursor.click {
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        /* Film Grain */
+        #grain {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* WebGL Canvas */
+        #webgl {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        /* Boot Sequence */
+        #boot-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--void);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', monospace;
+            transition: opacity 1.2s ease;
+        }
+        #boot-overlay.done { opacity: 0; pointer-events: none; }
+        #boot-terminal {
+            width: 90%;
+            max-width: 700px;
+            color: var(--cyan);
+            font-size: 13px;
+            line-height: 1.8;
+            text-shadow: 0 0 5px rgba(0,240,255,0.5);
+        }
+        #boot-terminal .cursor {
+            display: inline-block;
+            width: 8px; height: 15px;
+            background: var(--cyan);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* Glass */
+        .glass {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .glass-strong {
+            background: rgba(10,10,18,0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--cyan), var(--violet), var(--magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Chromatic Aberration on hover */
+        .chromatic-hover {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .chromatic-hover:hover {
+            text-shadow: 
+                2px 0 0 rgba(255,0,110,0.3),
+                -2px 0 0 rgba(0,240,255,0.3);
+        }
+
+        /* Nav */
+        .nav-hidden { transform: translateY(-100%); }
+        .nav-visible { transform: translateY(0); }
+
+        /* Hero */
+        .hero-title {
+            font-size: clamp(3rem, 12vw, 10rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+        .hero-sub {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+        }
+
+        /* 3D Card */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+        .card-3d-inner {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        .card-3d-glow {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s;
+            background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(0,240,255,0.15), transparent 60%);
+            pointer-events: none;
+        }
+        .card-3d:hover .card-3d-glow { opacity: 1; }
+
+        /* Skill Ring */
+        .skill-ring {
+            transform: rotate(-90deg);
+        }
+        .skill-ring-circle {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+        .skill-ring-bg { stroke: rgba(255,255,255,0.05); }
+        .skill-ring-fill {
+            stroke: url(#gradient-cyan-violet);
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 2s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        /* Terminal Mode */
+        #terminal-mode {
+            position: fixed;
+            inset: 0;
+            background: var(--void);
+            z-index: 9997;
+            display: none;
+            font-family: 'Space Grotesk', monospace;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        #terminal-mode.active { display: block; }
+        .terminal-line { color: var(--cyan); margin-bottom: 8px; font-size: 14px; }
+        .terminal-prompt { color: var(--magenta); }
+        .terminal-cmd { color: #fff; }
+        .terminal-output { color: #94a3b8; padding-left: 20px; }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        /* Section transitions */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        /* Mobile cursor disable */
+        @media (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+
+<!-- Film Grain -->
+<div id="grain"></div>
+
+<!-- WebGL Background -->
+<canvas id="webgl"></canvas>
+
+<!-- Boot Sequence -->
+<div id="boot-overlay">
+    <div id="boot-terminal">
+        <div id="boot-content"></div>
+        <span class="cursor"></span>
+    </div>
+</div>
+
+<!-- Terminal Easter Egg -->
+<div id="terminal-mode">
+    <div id="terminal-content"></div>
+</div>
+
+<!-- Navigation -->
+<nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-700 py-6 nav-hidden">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <a href="#" class="font-orbitron text-lg font-bold tracking-[0.2em] text-white magnetic-btn" data-magnetic>
+            JEFF<span class="text-cyan">.</span>OMONDI
+        </a>
+        <div class="hidden md:flex items-center gap-10">
+            <a href="#about" class="nav-link font-rajdhani text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-cyan transition-colors magnetic-btn" data-magnetic>About</a>
+            <a href="#skills" class="nav-link font-rajdhani text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-cyan transition-colors magnetic-btn" data-magnetic>Skills</a>
+            <a href="#tech" class="nav-link font-rajdhani text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-cyan transition-colors magnetic-btn" data-magnetic>Arsenal</a>
+            <a href="#projects" class="nav-link font-rajdhani text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-cyan transition-colors magnetic-btn" data-magnetic>Projects</a>
+            <a href="#workflow" class="nav-link font-rajdhani text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-cyan transition-colors magnetic-btn" data-magnetic>Pipeline</a>
+            <a href="#contact" class="nav-link font-rajdhani text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-cyan transition-colors magnetic-btn" data-magnetic>Contact</a>
+        </div>
+        <button id="menu-btn" class="md:hidden text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="fixed inset-0 z-40 bg-void/98 backdrop-blur-2xl flex flex-col items-center justify-center gap-8 translate-x-full transition-transform duration-500 md:hidden">
+    <button id="close-menu" class="absolute top-6 right-6 text-white">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    <a href="#about" class="mobile-link font-orbitron text-3xl text-white hover:text-cyan transition-colors">About</a>
+    <a href="#skills" class="mobile-link font-orbitron text-3xl text-white hover:text-cyan transition-colors">Skills</a>
+    <a href="#tech" class="mobile-link font-orbitron text-3xl text-white hover:text-cyan transition-colors">Arsenal</a>
+    <a href="#projects" class="mobile-link font-orbitron text-3xl text-white hover:text-cyan transition-colors">Projects</a>
+    <a href="#workflow" class="mobile-link font-orbitron text-3xl text-white hover:text-cyan transition-colors">Pipeline</a>
+    <a href="#contact" class="mobile-link font-orbitron text-3xl text-white hover:text-cyan transition-colors">Contact</a>
+</div>
+
+<main>
+<!-- Hero -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+    <div class="relative z-10 text-center max-w-6xl mx-auto">
+        <p class="hero-sub font-rajdhani text-cyan uppercase tracking-[0.4em] mb-8 reveal-up" id="hero-tagline">Data Scientist & Machine Learning Engineer</p>
+
+        <h1 class="hero-title font-orbitron font-black text-white mb-4" id="hero-title">
+            <span class="block overflow-hidden"><span class="inline-block hero-line">JEFF</span></span>
+            <span class="block overflow-hidden"><span class="inline-block hero-line gradient-text">OMONDI</span></span>
+        </h1>
+
+        <div class="h-12 md:h-16 mb-12 reveal-up" style="transition-delay: 0.4s">
+            <p class="hero-sub font-grotesk text-gray-400" id="hero-typing"></p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-6 justify-center reveal-up" style="transition-delay: 0.6s">
+            <a href="#projects" class="magnetic-btn group relative px-10 py-5 rounded-full overflow-hidden" data-magnetic>
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan to-violet opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan to-violet opacity-0 group-hover:opacity-50 blur-xl transition-opacity"></div>
+                <span class="relative font-rajdhani font-bold uppercase tracking-[0.2em] text-sm text-white">Explore Work</span>
+            </a>
+            <a href="#contact" class="magnetic-btn group relative px-10 py-5 rounded-full border border-white/10 hover:border-cyan/50 transition-all" data-magnetic>
+                <span class="relative font-rajdhani font-bold uppercase tracking-[0.2em] text-sm text-white group-hover:text-cyan transition-colors">Initiate Contact</span>
+            </a>
+        </div>
+
+        <div class="mt-20 flex justify-center gap-10 reveal-up" style="transition-delay: 0.8s">
+            <a href="https://github.com/Omondi-je" target="_blank" class="text-gray-600 hover:text-cyan transition-all duration-300 hover:scale-110">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://www.linkedin.com/in/jeff-omondi-a42b23310/" target="_blank" class="text-gray-600 hover:text-violet transition-all duration-300 hover:scale-110">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <a href="mailto:ojeff1211@gmail.com" class="text-gray-600 hover:text-magenta transition-all duration-300 hover:scale-110">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-50">
+        <div class="w-px h-16 bg-gradient-to-b from-transparent via-cyan to-transparent animate-pulse"></div>
+    </div>
+</section>
+
+<!-- About -->
+<section id="about" class="relative py-32 md:py-48 px-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="order-2 lg:order-1">
+                <p class="font-rajdhani text-cyan text-xs uppercase tracking-[0.4em] mb-6 reveal-up">01 — Identity</p>
+                <h2 class="font-orbitron text-4xl md:text-6xl font-bold text-white mb-8 leading-tight reveal-up">
+                    I don't just build <span class="chromatic-hover">models</span>.<br>
+                    I build <span class="gradient-text">systems</span>.
+                </h2>
+                <div class="space-y-6 font-grotesk text-gray-400 text-lg leading-relaxed reveal-up">
+                    <p>
+                        A <strong class="text-white">full-stack data practitioner</strong> who owns the entire pipeline — from ingesting raw data through Spark and Kafka, to engineering features, training models with PyTorch or XGBoost, containerizing with Docker, and monitoring production performance.
+                    </p>
+                    <p>
+                        The differentiator is <span class="text-cyan">breadth + depth</span>. Python, R, Rust, C++, Julia. Docker, Kubernetes, Airflow. Tableau, Streamlit, Dash. NLP, Computer Vision, Time Series, Recommenders.
+                    </p>
+                    <p class="text-gray-500">
+                        Problems at the intersection of statistics, software engineering, and business strategy.
+                    </p>
+                </div>
+            </div>
+            <div class="order-1 lg:order-2 relative reveal-scale">
+                <div class="relative aspect-square max-w-md mx-auto">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan/20 via-violet/20 to-magenta/20 rounded-3xl blur-3xl"></div>
+                    <div class="relative glass rounded-3xl p-8 h-full flex flex-col justify-center items-center text-center">
+                        <div class="grid grid-cols-2 gap-6 w-full">
+                            <div class="glass rounded-2xl p-6 border border-white/5">
+                                <div class="font-orbitron text-4xl md:text-5xl font-bold text-cyan mb-2" data-count="54">0</div>
+                                <div class="font-rajdhani text-gray-500 text-xs uppercase tracking-widest">Tools</div>
+                            </div>
+                            <div class="glass rounded-2xl p-6 border border-white/5">
+                                <div class="font-orbitron text-4xl md:text-5xl font-bold text-violet mb-2" data-count="6">0</div>
+                                <div class="font-rajdhani text-gray-500 text-xs uppercase tracking-widest">Projects</div>
+                            </div>
+                            <div class="glass rounded-2xl p-6 border border-white/5">
+                                <div class="font-orbitron text-4xl md:text-5xl font-bold text-magenta mb-2" data-count="10">0</div>
+                                <div class="font-rajdhani text-gray-500 text-xs uppercase tracking-widest">Languages</div>
+                            </div>
+                            <div class="glass rounded-2xl p-6 border border-white/5">
+                                <div class="font-orbitron text-4xl md:text-5xl font-bold text-white mb-2" data-count="7">0</div>
+                                <div class="font-rajdhani text-gray-500 text-xs uppercase tracking-widest">Pipeline Steps</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills -->
+<section id="skills" class="relative py-32 md:py-48 px-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <p class="font-rajdhani text-cyan text-xs uppercase tracking-[0.4em] mb-6 reveal-up">02 — Core Competencies</p>
+            <h2 class="font-orbitron text-4xl md:text-6xl font-bold text-white reveal-up">Technical <span class="gradient-text">Proficiency</span></h2>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8" id="skills-grid"></div>
+    </div>
+</section>
+
+<!-- Tech Stack -->
+<section id="tech" class="relative py-32 md:py-48 px-6 overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <p class="font-rajdhani text-cyan text-xs uppercase tracking-[0.4em] mb-6 reveal-up">03 — Technology Arsenal</p>
+            <h2 class="font-orbitron text-4xl md:text-6xl font-bold text-white mb-6 reveal-up">54 Tools. One Unified <span class="gradient-text">Workflow</span>.</h2>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3 mb-12 reveal-up" id="tech-filters">
+            <button class="tech-filter active px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="all">All</button>
+            <button class="tech-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="languages">Languages</button>
+            <button class="tech-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="python">Python</button>
+            <button class="tech-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="engineering">Engineering</button>
+            <button class="tech-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="mlops">MLOps</button>
+            <button class="tech-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="viz">Viz</button>
+            <button class="tech-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="tools">Dev</button>
+        </div>
+
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3" id="tech-grid"></div>
+    </div>
+</section>
+
+<!-- Projects -->
+<section id="projects" class="relative py-32 md:py-48 px-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <p class="font-rajdhani text-cyan text-xs uppercase tracking-[0.4em] mb-6 reveal-up">04 — Featured Work</p>
+            <h2 class="font-orbitron text-4xl md:text-6xl font-bold text-white mb-6 reveal-up">End-to-end Solutions.<br><span class="gradient-text">Measurable Impact</span>.</h2>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3 mb-12 reveal-up" id="project-filters">
+            <button class="project-filter active px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="all">All</button>
+            <button class="project-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="anomaly">Anomaly</button>
+            <button class="project-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="nlp">NLP</button>
+            <button class="project-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="cv">Vision</button>
+            <button class="project-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="classification">Classify</button>
+            <button class="project-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="timeseries">Time Series</button>
+            <button class="project-filter px-6 py-2 rounded-full border border-white/10 font-rajdhani text-xs uppercase tracking-widest transition-all hover:border-cyan/50" data-filter="recommendation">RecSys</button>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-grid"></div>
+    </div>
+</section>
+
+<!-- Workflow -->
+<section id="workflow" class="relative py-32 md:py-48 px-6 overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-24">
+            <p class="font-rajdhani text-cyan text-xs uppercase tracking-[0.4em] mb-6 reveal-up">05 — Methodology</p>
+            <h2 class="font-orbitron text-4xl md:text-6xl font-bold text-white mb-6 reveal-up">The <span class="gradient-text">Pipeline</span></h2>
+            <p class="font-grotesk text-gray-500 text-lg max-w-2xl mx-auto reveal-up">From raw data to production deployment — a systematic approach to solving complex data problems.</p>
+        </div>
+
+        <div class="relative" id="workflow-container"></div>
+    </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" class="relative py-32 md:py-48 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+        <p class="font-rajdhani text-cyan text-xs uppercase tracking-[0.4em] mb-6 reveal-up">06 — Transmission</p>
+        <h2 class="font-orbitron text-4xl md:text-7xl font-bold text-white mb-8 reveal-up">Have a data<br><span class="gradient-text">problem?</span></h2>
+        <p class="font-grotesk text-gray-400 text-xl mb-16 reveal-up">Let's solve it.</p>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-16">
+            <a href="mailto:ojeff1211@gmail.com" class="group glass rounded-2xl p-10 hover:border-cyan/30 transition-all duration-500 reveal-up">
+                <div class="w-16 h-16 rounded-2xl bg-cyan/5 border border-cyan/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-cyan/10 group-hover:scale-110 transition-all duration-500">
+                    <svg class="w-6 h-6 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 class="font-orbitron text-white font-bold mb-2">Email</h3>
+                <p class="font-grotesk text-gray-500 text-sm">ojeff1211@gmail.com</p>
+            </a>
+
+            <a href="https://github.com/Omondi-je" target="_blank" class="group glass rounded-2xl p-10 hover:border-violet/30 transition-all duration-500 reveal-up" style="transition-delay: 0.1s">
+                <div class="w-16 h-16 rounded-2xl bg-violet/5 border border-violet/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-violet/10 group-hover:scale-110 transition-all duration-500">
+                    <svg class="w-6 h-6 text-violet" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </div>
+                <h3 class="font-orbitron text-white font-bold mb-2">GitHub</h3>
+                <p class="font-grotesk text-gray-500 text-sm">@Omondi-je</p>
+            </a>
+
+            <a href="https://www.linkedin.com/in/jeff-omondi-a42b23310/" target="_blank" class="group glass rounded-2xl p-10 hover:border-magenta/30 transition-all duration-500 reveal-up" style="transition-delay: 0.2s">
+                <div class="w-16 h-16 rounded-2xl bg-magenta/5 border border-magenta/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-magenta/10 group-hover:scale-110 transition-all duration-500">
+                    <svg class="w-6 h-6 text-magenta" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </div>
+                <h3 class="font-orbitron text-white font-bold mb-2">LinkedIn</h3>
+                <p class="font-grotesk text-gray-500 text-sm">Jeff Omondi</p>
+            </a>
+        </div>
+
+        <div class="reveal-up">
+            <a href="#" class="magnetic-btn group relative inline-flex items-center gap-3 px-12 py-6 rounded-full overflow-hidden" data-magnetic>
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan via-violet to-magenta opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan via-violet to-magenta opacity-0 group-hover:opacity-40 blur-xl transition-opacity"></div>
+                <svg class="relative w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span class="relative font-rajdhani font-bold uppercase tracking-[0.2em] text-sm text-white">Download Resume</span>
+            </a>
+        </div>
+    </div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="relative py-16 px-6 border-t border-white/5">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="font-orbitron text-lg font-bold tracking-[0.2em] text-white">
+            JEFF<span class="text-cyan">.</span>OMONDI
+        </div>
+        <p class="font-grotesk text-gray-600 text-sm">Transforming complex data into intelligent, actionable solutions.</p>
+        <p class="font-grotesk text-gray-700 text-xs">Press <span class="text-cyan font-mono">~</span> for terminal mode</p>
+    </div>
+</footer>
+
+<!-- Project Modal -->
+<div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
+    <div class="modal-inner glass-strong rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-8 md:p-12 relative transform scale-95 transition-transform duration-500">
+        <button id="close-modal" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-cyan/50 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script type="module">
+// ==================== DATA ====================
+const DATA = {
+    skills: [
+        { name: "Python", level: 95 },
+        { name: "R", level: 88 },
+        { name: "SQL", level: 90 },
+        { name: "Machine Learning", level: 92 },
+        { name: "Deep Learning", level: 85 },
+        { name: "Data Engineering", level: 88 },
+        { name: "MLOps", level: 82 },
+        { name: "Cloud Platforms", level: 80 },
+        { name: "Statistical Analysis", level: 90 },
+        { name: "Data Visualization", level: 87 }
+    ],
+    tech: [
+        { name: "Python", cat: "languages" }, { name: "R", cat: "languages" }, { name: "SQL", cat: "languages" },
+        { name: "C++", cat: "languages" }, { name: "Rust", cat: "languages" }, { name: "Julia", cat: "languages" },
+        { name: "JS", cat: "languages" }, { name: "TypeScript", cat: "languages" }, { name: "MATLAB", cat: "languages" }, { name: "SAS", cat: "languages" },
+        { name: "NumPy", cat: "python" }, { name: "Pandas", cat: "python" }, { name: "Polars", cat: "python" },
+        { name: "SciPy", cat: "python" }, { name: "Matplotlib", cat: "python" }, { name: "Seaborn", cat: "python" },
+        { name: "Plotly", cat: "python" }, { name: "Altair", cat: "python" }, { name: "Bokeh", cat: "python" },
+        { name: "Scikit-learn", cat: "python" }, { name: "XGBoost", cat: "python" }, { name: "LightGBM", cat: "python" },
+        { name: "CatBoost", cat: "python" }, { name: "TensorFlow", cat: "python" }, { name: "PyTorch", cat: "python" },
+        { name: "Keras", cat: "python" }, { name: "NLTK", cat: "python" }, { name: "spaCy", cat: "python" },
+        { name: "HuggingFace", cat: "python" }, { name: "Gensim", cat: "python" }, { name: "OpenCV", cat: "python" },
+        { name: "Detectron2", cat: "python" }, { name: "YOLO", cat: "python" },
+        { name: "Spark", cat: "engineering" }, { name: "PySpark", cat: "engineering" }, { name: "Dask", cat: "engineering" },
+        { name: "Kafka", cat: "engineering" }, { name: "Airflow", cat: "engineering" }, { name: "PostgreSQL", cat: "engineering" },
+        { name: "MongoDB", cat: "engineering" }, { name: "Snowflake", cat: "engineering" }, { name: "BigQuery", cat: "engineering" },
+        { name: "MLflow", cat: "mlops" }, { name: "Docker", cat: "mlops" }, { name: "Kubernetes", cat: "mlops" },
+        { name: "FastAPI", cat: "mlops" }, { name: "AWS", cat: "mlops" }, { name: "GCP", cat: "mlops" },
+        { name: "Azure", cat: "mlops" }, { name: "GitHub Actions", cat: "mlops" },
+        { name: "Tableau", cat: "viz" }, { name: "Power BI", cat: "viz" }, { name: "Streamlit", cat: "viz" }, { name: "Dash", cat: "viz" },
+        { name: "Git", cat: "tools" }, { name: "GitHub", cat: "tools" }, { name: "Jupyter", cat: "tools" },
+        { name: "VS Code", cat: "tools" }, { name: "React", cat: "tools" }, { name: "Next.js", cat: "tools" }, { name: "Tailwind", cat: "tools" }
+    ],
+    projects: [
+        {
+            id: 1, title: "Real-Time Fraud Detection", category: "anomaly",
+            domain: "Anomaly Detection / Financial Services",
+            problem: "Detect fraudulent credit card transactions in real-time with minimal latency",
+            dataset: "European Credit Card Transactions (284,807 records, highly imbalanced)",
+            tech: ["Python", "Apache Kafka", "Spark Streaming", "Scikit-learn", "PostgreSQL"],
+            methods: ["Isolation Forest", "One-Class SVM", "SMOTE", "Feature Engineering", "Real-time Processing"],
+            results: ["95% precision on fraud cases", "50ms latency", "40% reduction in false positives", "Processing 10K+ transactions/second"],
+            github: "https://github.com/Omondi-je/fraud-detection-system",
+            color: "cyan"
+        },
+        {
+            id: 2, title: "NLP Sentiment Analysis API", category: "nlp",
+            domain: "NLP / Social Media Analytics",
+            problem: "Deploy a scalable sentiment analysis service for social media monitoring",
+            dataset: "Twitter Sentiment Dataset (1.6M labeled tweets)",
+            tech: ["Python", "FastAPI", "Docker", "Hugging Face Transformers", "Redis"],
+            methods: ["BERT Fine-tuning", "Text Preprocessing", "Model Quantization", "REST API Design"],
+            results: ["88% accuracy", "2,000+ requests/minute", "Deployed on AWS with auto-scaling"],
+            github: "https://github.com/Omondi-je/sentiment-api",
+            color: "violet"
+        },
+        {
+            id: 3, title: "CV Inventory System", category: "cv",
+            domain: "Computer Vision / Warehouse Automation",
+            problem: "Automated inventory counting using computer vision",
+            dataset: "Custom dataset of 50K warehouse images, 15 product categories",
+            tech: ["Python", "PyTorch", "YOLOv8", "OpenCV", "MLflow"],
+            methods: ["Transfer Learning", "Data Augmentation", "Hyperparameter Tuning", "Model Versioning"],
+            results: ["92% mAP", "80% reduction in inventory counting time", "MLflow tracking"],
+            github: "https://github.com/Omondi-je/cv-inventory",
+            color: "magenta"
+        },
+        {
+            id: 4, title: "Customer Churn Pipeline", category: "classification",
+            domain: "Classification / Telecom",
+            problem: "Predict customer churn with automated retraining pipeline",
+            dataset: "Telco Customer Churn (7,043 records, 21 features)",
+            tech: ["Python", "Apache Airflow", "Scikit-learn", "Snowflake", "Tableau"],
+            methods: ["XGBoost", "Random Forest", "Feature Engineering", "Pipeline Automation"],
+            results: ["89% accuracy", "0.87 F1-score", "Automated weekly retraining", "Stakeholder dashboard"],
+            github: "https://github.com/Omondi-je/churn-pipeline",
+            color: "cyan"
+        },
+        {
+            id: 5, title: "Sales Forecasting Engine", category: "timeseries",
+            domain: "Time Series / Retail",
+            problem: "Forecast demand across 100+ SKUs to optimize inventory",
+            dataset: "2 years of daily sales data (73K records per SKU)",
+            tech: ["Python", "Prophet", "TensorFlow", "BigQuery", "Looker"],
+            methods: ["ARIMA", "Prophet", "LSTM", "Ensemble Methods", "Cross-validation"],
+            results: ["8.5% MAPE", "35% reduction in stockouts", "25% improvement in inventory turnover"],
+            github: "https://github.com/Omondi-je/sales-forecasting",
+            color: "violet"
+        },
+        {
+            id: 6, title: "Recommendation Engine", category: "recommendation",
+            domain: "Recommendation Systems / E-commerce",
+            problem: "Personalized product recommendations at scale",
+            dataset: "User behavior data (10M interactions, 100K users, 50K products)",
+            tech: ["Python", "PySpark", "Redis", "FastAPI", "AWS SageMaker"],
+            methods: ["Collaborative Filtering", "Matrix Factorization", "Deep Learning", "A/B Testing"],
+            results: ["35% increase in click-through rate", "28% boost in conversion"],
+            github: "https://github.com/Omondi-je/recommendation-engine",
+            color: "magenta"
+        }
+    ],
+    workflow: [
+        { step: 1, title: "Problem Definition", desc: "Understand business objectives, define KPIs, translate requirements into data science problems" },
+        { step: 2, title: "Data Collection & Engineering", desc: "Design pipelines, extract from multiple sources, handle streaming (Kafka) and batch (Spark) processing" },
+        { step: 3, title: "Exploratory Data Analysis", desc: "Statistical analysis, visualization with Plotly/Seaborn, correlation analysis, hypothesis testing" },
+        { step: 4, title: "Data Preprocessing", desc: "Clean data, handle missing values, outliers, encoding, normalization (Pandas/Polars)" },
+        { step: 5, title: "Feature Engineering", desc: "Create domain-specific features, dimensionality reduction, selection using statistical methods" },
+        { step: 6, title: "Model Development", desc: "Train multiple algorithms (XGBoost, Neural Networks), hyperparameter tuning with Optuna" },
+        { step: 7, title: "MLOps & Deployment", desc: "Containerize with Docker, orchestrate with Kubernetes, monitor with Prometheus/Grafana" }
+    ]
+};
+
+// ==================== BOOT SEQUENCE ====================
+const bootLines = [
+    "> initializing system kernel...",
+    "> loading neural network modules...",
+    "> mounting data pipelines...",
+    "> calibrating ML models...",
+    "> establishing cloud connections...",
+    "> rendering portfolio environment...",
+    "> access granted."
+];
+
+async function runBoot() {
+    const terminal = document.getElementById('boot-content');
+    const overlay = document.getElementById('boot-overlay');
+
+    for (let line of bootLines) {
+        const div = document.createElement('div');
+        div.textContent = line;
+        terminal.appendChild(div);
+        await new Promise(r => setTimeout(r, 350));
+    }
+
+    await new Promise(r => setTimeout(r, 600));
+    overlay.classList.add('done');
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        initHeroAnimations();
+    }, 1200);
+}
+
+// Safety: hide boot after 5s no matter what
+setTimeout(() => {
+    const overlay = document.getElementById('boot-overlay');
+    if (overlay && overlay.style.display !== 'none') {
+        overlay.classList.add('done');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            initHeroAnimations();
+        }, 1200);
+    }
+}, 5000);
+
+// ==================== CUSTOM CURSOR ====================
+const cursor = document.getElementById('cursor');
+let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+
+if (window.matchMedia('(pointer: fine)').matches) {
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function animateCursor() {
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    document.querySelectorAll('a, button, .card-3d, .tech-item').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    document.addEventListener('mousedown', () => cursor.classList.add('click'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('click'));
+}
+
+// ==================== MAGNETIC BUTTONS ====================
+document.querySelectorAll('[data-magnetic]').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0, 0)';
+    });
+});
+
+// ==================== WEBGL NEBULA ====================
+try {
+    const canvas = document.getElementById('webgl');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+    if (gl) {
+        // Simple but stunning WebGL nebula using raw WebGL (no Three.js import issues)
+        const vsSource = `
+            attribute vec2 position;
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        const fsSource = `
+            precision highp float;
+            uniform float uTime;
+            uniform vec2 uResolution;
+            uniform vec2 uMouse;
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+            float snoise(vec3 v) {
+                const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+                vec3 i  = floor(v + dot(v, C.yyy));
+                vec3 x0 = v - i + dot(i, C.xxx);
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min(g.xyz, l.zxy);
+                vec3 i2 = max(g.xyz, l.zxy);
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + C.yyy;
+                vec3 x3 = x0 - D.yyy;
+                i = mod289(i);
+                vec4 p = permute(permute(permute(
+                    i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+                float n_ = 0.142857142857;
+                vec3 ns = n_ * D.wyz - D.xzx;
+                vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_);
+                vec4 x = x_ * ns.x + ns.yyyy;
+                vec4 y = y_ * ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+                vec4 b0 = vec4(x.xy, y.xy);
+                vec4 b1 = vec4(x.zw, y.zw);
+                vec4 s0 = floor(b0)*2.0 + 1.0;
+                vec4 s1 = floor(b1)*2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+                vec3 p0 = vec3(a0.xy, h.x);
+                vec3 p1 = vec3(a0.zw, h.y);
+                vec3 p2 = vec3(a1.xy, h.z);
+                vec3 p3 = vec3(a1.zw, h.w);
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+            }
+
+            float fbm(vec3 x) {
+                float v = 0.0;
+                float a = 0.5;
+                vec3 shift = vec3(100.0);
+                for (int i = 0; i < 5; ++i) {
+                    v += a * snoise(x);
+                    x = x * 2.0 + shift;
+                    a *= 0.5;
+                }
+                return v;
+            }
+
+            void main() {
+                vec2 uv = gl_FragCoord.xy / uResolution;
+                vec2 p = uv * 2.0 - 1.0;
+                p.x *= uResolution.x / uResolution.y;
+
+                float t = uTime * 0.08;
+                vec2 mouse = (uMouse / uResolution) * 2.0 - 1.0;
+                mouse.x *= uResolution.x / uResolution.y;
+
+                vec2 q = vec2(
+                    fbm(vec3(p * 1.5 + t, t * 0.3)),
+                    fbm(vec3(p * 1.5 + vec2(5.2,1.3) + t, t * 0.3))
+                );
+
+                vec2 r = vec2(
+                    fbm(vec3(p * 1.5 + 1.0*q + vec2(1.7,9.2) + t*0.15, t)),
+                    fbm(vec3(p * 1.5 + 1.0*q + vec2(8.3,2.8) + t*0.126, t))
+                );
+
+                float f = fbm(vec3(p * 1.5 + r, t));
+
+                vec3 col1 = vec3(0.0, 0.94, 1.0);
+                vec3 col2 = vec3(0.74, 0.0, 1.0);
+                vec3 col3 = vec3(1.0, 0.0, 0.43);
+
+                vec3 color = mix(col1, col2, clamp(f*f*2.0, 0.0, 1.0));
+                color = mix(color, col3, clamp(length(q)*0.5, 0.0, 1.0));
+                color = mix(color, col1, clamp(length(r.x)*0.3, 0.0, 1.0));
+
+                float dist = length(p - mouse);
+                color += vec3(0.05, 0.2, 0.3) * smoothstep(0.8, 0.0, dist) * 0.4;
+
+                float vig = 1.0 - dot(uv - 0.5, uv - 0.5) * 1.5;
+                color *= vig;
+                color *= 0.45;
+
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+        const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        gl.useProgram(program);
+
+        const vertices = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+        const posLoc = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+        const uTime = gl.getUniformLocation(program, 'uTime');
+        const uRes = gl.getUniformLocation(program, 'uResolution');
+        const uMouse = gl.getUniformLocation(program, 'uMouse');
+
+        let targetMouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let currentMouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouse.x = e.clientX;
+            targetMouse.y = window.innerHeight - e.clientY;
+        });
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let startTime = Date.now();
+        function render() {
+            const t = (Date.now() - startTime) / 1000;
+            currentMouse.x += (targetMouse.x - currentMouse.x) * 0.05;
+            currentMouse.y += (targetMouse.y - currentMouse.y) * 0.05;
+
+            gl.uniform1f(uTime, t);
+            gl.uniform2f(uRes, canvas.width, canvas.height);
+            gl.uniform2f(uMouse, currentMouse.x, currentMouse.y);
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+        render();
+    }
+} catch(e) {
+    console.log('WebGL not available, falling back to CSS background');
+    document.getElementById('webgl').style.background = 'radial-gradient(ellipse at center, #0a0a1a 0%, #020204 100%)';
+}
+
+// ==================== LENIS SMOOTH SCROLL ====================
+const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    direction: 'vertical',
+    gestureDirection: 'vertical',
+    smooth: true,
+    smoothTouch: false,
+    touchMultiplier: 2,
+});
+
+function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => {
+    lenis.raf(time * 1000);
+});
+gsap.ticker.lagSmoothing(0);
+
+// ==================== NAVIGATION ====================
+const navbar = document.getElementById('navbar');
+let lastScroll = 0;
+
+lenis.on('scroll', ({ scroll }) => {
+    if (scroll > 100) {
+        navbar.classList.remove('nav-hidden');
+        navbar.classList.add('nav-visible');
+        navbar.style.background = 'rgba(2,2,4,0.8)';
+        navbar.style.backdropFilter = 'blur(20px)';
+        navbar.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+    } else {
+        navbar.classList.add('nav-hidden');
+        navbar.classList.remove('nav-visible');
+    }
+    lastScroll = scroll;
+});
+
+// Mobile menu
+document.getElementById('menu-btn').addEventListener('click', () => {
+    document.getElementById('mobile-menu').style.transform = 'translateX(0)';
+});
+document.getElementById('close-menu').addEventListener('click', () => {
+    document.getElementById('mobile-menu').style.transform = 'translateX(100%)';
+});
+document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').style.transform = 'translateX(100%)';
+    });
+});
+
+// ==================== HERO ANIMATIONS ====================
+function initHeroAnimations() {
+    gsap.from('.hero-line', {
+        y: '100%',
+        duration: 1.2,
+        stagger: 0.2,
+        ease: "power4.out"
+    });
+
+    gsap.to('.reveal-up', {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
+        delay: 0.5
+    });
+
+    // Typing effect
+    const phrases = [
+        "Transforming complex data into intelligent, actionable solutions",
+        "Building production-grade ML systems from end to end",
+        "Turning raw data into business decisions at scale"
+    ];
+    let pi = 0, ci = 0, deleting = false;
+    const el = document.getElementById('hero-typing');
+
+    function type() {
+        const cur = phrases[pi];
+        if (deleting) {
+            el.textContent = cur.substring(0, ci - 1);
+            ci--;
+        } else {
+            el.textContent = cur.substring(0, ci + 1);
+            ci++;
+        }
+        let spd = deleting ? 25 : 40;
+        if (!deleting && ci === cur.length) { spd = 2500; deleting = true; }
+        else if (deleting && ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; spd = 500; }
+        setTimeout(type, spd);
+    }
+    setTimeout(type, 1200);
+}
+
+// ==================== SCROLL REVEALS ====================
+gsap.utils.toArray('.reveal-up').forEach(el => {
+    gsap.fromTo(el, 
+        { opacity: 0, y: 60 },
+        {
+            opacity: 1, y: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                toggleActions: "play none none none"
+            }
+        }
+    );
+});
+
+gsap.utils.toArray('.reveal-scale').forEach(el => {
+    gsap.fromTo(el,
+        { opacity: 0, scale: 0.9 },
+        {
+            opacity: 1, scale: 1,
+            duration: 1.2,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                toggleActions: "play none none none"
+            }
+        }
+    );
+});
+
+// ==================== COUNTER ANIMATION ====================
+const counters = document.querySelectorAll('[data-count]');
+counters.forEach(counter => {
+    const target = +counter.getAttribute('data-count');
+    ScrollTrigger.create({
+        trigger: counter,
+        start: "top 90%",
+        onEnter: () => {
+            gsap.to(counter, {
+                innerText: target,
+                duration: 2,
+                snap: { innerText: 1 },
+                ease: "power2.out"
+            });
+        }
+    });
+});
+
+// ==================== SKILLS RENDERING ====================
+function renderSkills() {
+    const grid = document.getElementById('skills-grid');
+    grid.innerHTML = DATA.skills.map((skill, i) => {
+        const offset = 283 - (283 * skill.level / 100);
+        return `
+        <div class="reveal-up flex flex-col items-center" style="transition-delay: ${i * 0.05}s">
+            <div class="relative w-28 h-28 mb-4">
+                <svg class="skill-ring w-28 h-28" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="gradient-cyan-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00f0ff"/>
+                            <stop offset="100%" style="stop-color:#bd00ff"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="skill-ring-circle skill-ring-bg" cx="50" cy="50" r="45"/>
+                    <circle class="skill-ring-circle skill-ring-fill" cx="50" cy="50" r="45" 
+                        style="stroke-dashoffset: 283" 
+                        data-offset="${offset}"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="font-orbitron text-lg font-bold text-white">${skill.level}%</span>
+                </div>
+            </div>
+            <span class="font-rajdhani text-gray-400 text-sm uppercase tracking-wider">${skill.name}</span>
+        </div>
+        `;
+    }).join('');
+
+    ScrollTrigger.create({
+        trigger: grid,
+        start: "top 80%",
+        onEnter: () => {
+            document.querySelectorAll('.skill-ring-fill').forEach((ring, i) => {
+                setTimeout(() => {
+                    ring.style.strokeDashoffset = ring.getAttribute('data-offset');
+                }, i * 100);
+            });
+        }
+    });
+}
+renderSkills();
+
+// ==================== TECH STACK ====================
+function renderTech(filter = 'all') {
+    const grid = document.getElementById('tech-grid');
+    const items = filter === 'all' ? DATA.tech : DATA.tech.filter(t => t.cat === filter);
+    grid.innerHTML = items.map((tech, i) => `
+        <div class="tech-item glass rounded-xl p-4 text-center border border-white/5 hover:border-cyan/20 transition-all duration-300 group reveal-up" style="transition-delay: ${i * 0.02}s">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan/10 to-violet/10 flex items-center justify-center mx-auto mb-2 group-hover:from-cyan/20 group-hover:to-violet/20 transition-all">
+                <span class="font-orbitron text-cyan text-xs font-bold">${tech.name.substring(0,2).toUpperCase()}</span>
+            </div>
+            <span class="font-grotesk text-gray-400 text-xs group-hover:text-white transition-colors">${tech.name}</span>
+        </div>
+    `).join('');
+}
+renderTech();
+
+document.querySelectorAll('.tech-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tech-filter').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = '';
+            b.style.color = '';
+            b.style.borderColor = 'rgba(255,255,255,0.1)';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'linear-gradient(135deg, #00f0ff, #bd00ff)';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'transparent';
+        renderTech(btn.getAttribute('data-filter'));
+    });
+});
+document.querySelector('.tech-filter.active').style.background = 'linear-gradient(135deg, #00f0ff, #bd00ff)';
+document.querySelector('.tech-filter.active').style.color = 'white';
+
+// ==================== PROJECTS ====================
+function renderProjects(filter = 'all') {
+    const grid = document.getElementById('projects-grid');
+    const items = filter === 'all' ? DATA.projects : DATA.projects.filter(p => p.category === filter);
+
+    grid.innerHTML = items.map((project, i) => `
+        <div class="card-3d group reveal-up" style="transition-delay: ${i * 0.1}s" onclick="window.openModal(${project.id})">
+            <div class="card-3d-inner glass rounded-2xl overflow-hidden border border-white/5 hover:border-${project.color}/30 transition-all duration-500 relative">
+                <div class="card-3d-glow rounded-2xl"></div>
+                <div class="h-1 bg-gradient-to-r from-${project.color} to-${project.color === 'cyan' ? 'violet' : project.color === 'violet' ? 'magenta' : 'cyan'}"></div>
+                <div class="p-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-3 py-1 rounded-full bg-${project.color}/5 text-${project.color} font-rajdhani text-[10px] uppercase tracking-widest border border-${project.color}/10">
+                            ${project.domain.split(' / ')[0]}
+                        </span>
+                    </div>
+                    <h3 class="font-orbitron text-xl font-bold text-white mb-3 group-hover:text-${project.color} transition-colors">${project.title}</h3>
+                    <p class="font-grotesk text-gray-500 text-sm mb-6 line-clamp-2">${project.problem}</p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        ${project.tech.slice(0, 3).map(t => `<span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs font-grotesk">${t}</span>`).join('')}
+                        ${project.tech.length > 3 ? `<span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs font-grotesk">+${project.tech.length - 3}</span>` : ''}
+                    </div>
+                    <span class="font-rajdhani text-${project.color} text-xs uppercase tracking-widest group-hover:tracking-[0.3em] transition-all">View Case Study →</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    init3DCards();
+}
+renderProjects();
+
+document.querySelectorAll('.project-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.project-filter').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = '';
+            b.style.color = '';
+            b.style.borderColor = 'rgba(255,255,255,0.1)';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'linear-gradient(135deg, #00f0ff, #bd00ff)';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'transparent';
+        renderProjects(btn.getAttribute('data-filter'));
+    });
+});
+document.querySelector('.project-filter.active').style.background = 'linear-gradient(135deg, #00f0ff, #bd00ff)';
+document.querySelector('.project-filter.active').style.color = 'white';
+
+// 3D Tilt
+function init3DCards() {
+    document.querySelectorAll('.card-3d').forEach(card => {
+        const inner = card.querySelector('.card-3d-inner');
+        const glow = card.querySelector('.card-3d-glow');
+
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cx = rect.width / 2;
+            const cy = rect.height / 2;
+            const rx = (y - cy) / 12;
+            const ry = (cx - x) / 12;
+
+            inner.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale3d(1.02, 1.02, 1.02)`;
+            if (glow) {
+                glow.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+                glow.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+            }
+        });
+
+        card.addEventListener('mouseleave', () => {
+            inner.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+        });
+    });
+}
+
+// ==================== MODAL ====================
+const modal = document.getElementById('project-modal');
+const modalInner = modal.querySelector('.modal-inner');
+const modalBody = document.getElementById('modal-body');
+
+window.openModal = function(id) {
+    const p = DATA.projects.find(x => x.id === id);
+    if (!p) return;
+
+    const colorMap = { cyan: '#00f0ff', violet: '#bd00ff', magenta: '#ff006e' };
+    const c = colorMap[p.color];
+
+    modalBody.innerHTML = `
+        <div class="mb-4">
+            <span class="px-3 py-1 rounded-full font-rajdhani text-[10px] uppercase tracking-widest border" style="color: ${c}; border-color: ${c}20; background: ${c}10">
+                ${p.domain}
+            </span>
+        </div>
+        <h2 class="font-orbitron text-3xl font-bold text-white mb-6">${p.title}</h2>
+
+        <div class="space-y-6">
+            <div>
+                <h3 class="font-rajdhani text-cyan uppercase tracking-widest text-xs mb-2">Problem</h3>
+                <p class="font-grotesk text-gray-300">${p.problem}</p>
+            </div>
+            <div>
+                <h3 class="font-rajdhani text-cyan uppercase tracking-widest text-xs mb-2">Dataset</h3>
+                <p class="font-grotesk text-gray-300">${p.dataset}</p>
+            </div>
+            <div>
+                <h3 class="font-rajdhani text-cyan uppercase tracking-widest text-xs mb-2">Tech Stack</h3>
+                <div class="flex flex-wrap gap-2">
+                    ${p.tech.map(t => `<span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm font-grotesk border border-white/5">${t}</span>`).join('')}
+                </div>
+            </div>
+            <div>
+                <h3 class="font-rajdhani text-cyan uppercase tracking-widest text-xs mb-2">Methods</h3>
+                <div class="flex flex-wrap gap-2">
+                    ${p.methods.map(m => `<span class="px-3 py-1 rounded-full bg-violet/5 text-violet text-sm font-grotesk border border-violet/10">${m}</span>`).join('')}
+                </div>
+            </div>
+            <div>
+                <h3 class="font-rajdhani text-cyan uppercase tracking-widest text-xs mb-2">Results</h3>
+                <ul class="space-y-2">
+                    ${p.results.map(r => `<li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style="background: ${c}"></span><span class="font-grotesk text-gray-300">${r}</span></li>`).join('')}
+                </ul>
+            </div>
+            <a href="${p.github}" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-rajdhani font-bold uppercase tracking-widest text-sm text-white transition-all hover:scale-105" style="background: linear-gradient(135deg, ${c}, ${p.color === 'cyan' ? '#bd00ff' : p.color === 'violet' ? '#ff006e' : '#00f0ff'})">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                View on GitHub
+            </a>
+        </div>
+    `;
+
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'all';
+    modalInner.style.transform = 'scale(1)';
+    document.body.style.overflow = 'hidden';
+};
+
+document.getElementById('close-modal').addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+function closeModal() {
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+    modalInner.style.transform = 'scale(0.95)';
+    document.body.style.overflow = '';
+}
+
+// ==================== WORKFLOW ====================
+function renderWorkflow() {
+    const container = document.getElementById('workflow-container');
+    const colors = ['cyan', 'violet', 'magenta', 'cyan', 'violet', 'magenta', 'cyan'];
+
+    container.innerHTML = `
+        <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2">
+            <div class="w-full h-full bg-gradient-to-b from-cyan via-violet to-magenta opacity-20"></div>
+        </div>
+        <div class="space-y-16 md:space-y-24">
+            ${DATA.workflow.map((item, i) => `
+                <div class="relative flex flex-col md:flex-row items-center gap-8 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}">
+                    <div class="hidden md:block md:w-1/2 ${i % 2 === 0 ? 'md:text-right md:pr-16' : 'md:text-left md:pl-16'}">
+                        <div class="reveal-up inline-block">
+                            <div class="glass rounded-2xl p-8 border border-white/5 hover:border-${colors[i]}/20 transition-all duration-500 group">
+                                <span class="font-orbitron text-5xl font-bold text-white/5 group-hover:text-${colors[i]}/20 transition-colors">0${item.step}</span>
+                                <h3 class="font-orbitron text-2xl font-bold text-white mt-2 mb-3">${item.title}</h3>
+                                <p class="font-grotesk text-gray-400 max-w-sm ${i % 2 === 0 ? 'md:ml-auto' : ''}">${item.desc}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute left-4 md:left-1/2 w-3 h-3 rounded-full bg-${colors[i]} md:-translate-x-1/2 shadow-[0_0_20px_currentColor]"></div>
+
+                    <div class="md:hidden pl-12 w-full">
+                        <div class="glass rounded-2xl p-6 border border-white/5">
+                            <span class="font-orbitron text-3xl font-bold text-cyan/20">0${item.step}</span>
+                            <h3 class="font-orbitron text-xl font-bold text-white mt-2 mb-2">${item.title}</h3>
+                            <p class="font-grotesk text-gray-400 text-sm">${item.desc}</p>
+                        </div>
+                    </div>
+
+                    <div class="hidden md:block md:w-1/2"></div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+renderWorkflow();
+
+// ==================== TERMINAL EASTER EGG ====================
+let terminalActive = false;
+const terminalMode = document.getElementById('terminal-mode');
+const terminalContent = document.getElementById('terminal-content');
+
+const terminalData = [
+    { type: 'prompt', text: 'whoami' },
+    { type: 'output', text: 'jeff_omondi — Data Scientist & ML Engineer' },
+    { type: 'prompt', text: 'ls -la skills/' },
+    { type: 'output', text: 'drwxr-xr-x  python  ml  dl  nlp  cv  engineering  mlops  cloud  stats  viz' },
+    { type: 'prompt', text: 'cat projects/fraud_detection/README.md' },
+    { type: 'output', text: 'Real-Time Fraud Detection System\\n95% precision | 50ms latency | 10K+ TPS\\nStack: Kafka, Spark, Scikit-learn, PostgreSQL' },
+    { type: 'prompt', text: 'docker ps' },
+    { type: 'output', text: 'CONTAINER ID  IMAGE                    STATUS  PORTS\\na1b2c3d4      sentiment-api:latest     Up 3d   0.0.0.0:8000->8000/tcp\\ne5f6g7h8      fraud-detection:latest   Up 5d   0.0.0.0:8080->8080/tcp\\ni9j0k1l2      churn-pipeline:latest    Up 1d   0.0.0.0:3000->3000/tcp' },
+    { type: 'prompt', text: 'kubectl get pods' },
+    { type: 'output', text: 'NAME                              READY  STATUS\\nrecommendation-engine-7d9f4b8c5   3/3    Running\\nsales-forecasting-4a2e8d1f9       2/2    Running\\ncv-inventory-9c3b7a2e4            4/4    Running' },
+    { type: 'prompt', text: 'git log --oneline -5' },
+    { type: 'output', text: 'a3f7d2e feat: deploy recommendation engine to production\\n8b1c4a9 fix: optimize kafka consumer lag\\nc9e2d5f refactor: migrate ETL from pandas to polars\\nd4a8b1e feat: add real-time monitoring with prometheus\\ne7f3c2d initial: project scaffold' },
+    { type: 'prompt', text: 'exit' },
+];
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === '~' || e.key === '`') {
+        e.preventDefault();
+        terminalActive = !terminalActive;
+        if (terminalActive) {
+            terminalMode.classList.add('active');
+            lenis.stop();
+            renderTerminal();
+        } else {
+            terminalMode.classList.remove('active');
+            lenis.start();
+        }
+    }
+});
+
+async function renderTerminal() {
+    terminalContent.innerHTML = '';
+    for (const line of terminalData) {
+        const div = document.createElement('div');
+        div.className = 'terminal-line';
+        if (line.type === 'prompt') {
+            div.innerHTML = `<span class="terminal-prompt">jeff@omondi:~$</span> <span class="terminal-cmd">${line.text}</span>`;
+        } else {
+            div.innerHTML = `<div class="terminal-output">${line.text.replace(/\\n/g, '<br>')}</div>`;
+        }
+        terminalContent.appendChild(div);
+        terminalMode.scrollTop = terminalMode.scrollHeight;
+        await new Promise(r => setTimeout(r, 300));
+    }
+}
+
+// ==================== INIT ====================
+runBoot();
+</script>
+</body>
+</html>
